@@ -32,6 +32,8 @@
             android:layout_height="wrap_content"
             android:textSize="24sp"
             android:layout_weight="0.5"
+            android:paddingStart="4dp"
+            android:paddingLeft="4dp"
             android:text="@string/beverage_id" />
 
         <EditText
@@ -56,6 +58,8 @@
             android:layout_height="wrap_content"
             android:textSize="24sp"
             android:layout_weight="0.5"
+            android:paddingStart="4dp"
+            android:paddingLeft="4dp"
             android:text="@string/beverage_pack" />
 
         <EditText
@@ -80,6 +84,8 @@
             android:layout_height="wrap_content"
             android:textSize="24sp"
             android:layout_weight="0.5"
+            android:paddingStart="4dp"
+            android:paddingLeft="4dp"
             android:text="@string/beverage_price" />
 
         <EditText
@@ -104,6 +110,8 @@
             android:layout_height="wrap_content"
             android:textSize="24sp"
             android:layout_weight="0.5"
+            android:paddingStart="4dp"
+            android:paddingLeft="4dp"
             android:text="@string/beverage_active" />
 
         <CheckBox

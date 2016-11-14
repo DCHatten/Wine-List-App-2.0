@@ -92,7 +92,9 @@ public class BeverageCollection {
         } catch (Exception e) {
             Log.e("Read CSV", e.toString());
         } finally {
-            scanner.close();
+            if (scanner != null) {
+                scanner.close();
+            }
         }
     }
 }

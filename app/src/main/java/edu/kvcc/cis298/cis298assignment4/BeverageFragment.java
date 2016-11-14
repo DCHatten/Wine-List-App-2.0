@@ -18,7 +18,7 @@ import android.widget.EditText;
 public class BeverageFragment extends Fragment {
 
     //String key that will be used to send data between fragments
-    private static final String ARG_BEVERAGE_ID = "crime_id";
+    private static final String ARG_BEVERAGE_ID = "beverage_id";
 
     //private class level vars for the model properties
     private EditText mId;

@@ -16,14 +16,14 @@ import java.util.List;
  */
 public class BeveragePagerActivity extends FragmentActivity {
 
-    //String that can be used as a key for sendin data between activities
+    //String that can be used as a key for send in data between activities
     private static final String EXTRA_BEVERAGE_ID = "edu.kvcc.cis298.cis298assignment4.beverage_id";
 
     //Private vars for the viewpager and the list of beverages
     private ViewPager mViewPager;
     private List<Beverage> mBeverages;
 
-    //Public static method that will return a properly formateed intent that can get this activity started
+    //Public static method that will return a properly formatted intent that can get this activity started
     public static Intent newIntent(Context context, String id) {
         Intent intent = new Intent(context, BeveragePagerActivity.class);
         intent.putExtra(EXTRA_BEVERAGE_ID, id);
