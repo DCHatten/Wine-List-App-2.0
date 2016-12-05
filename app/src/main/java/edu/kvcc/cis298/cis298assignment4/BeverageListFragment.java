@@ -1,6 +1,7 @@
 package edu.kvcc.cis298.cis298assignment4;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -22,6 +23,14 @@ public class BeverageListFragment extends Fragment {
     //Private variables for the recycler view and the required adapter
     private RecyclerView mBeverageRecyclerView;
     private BeverageAdapter mBeverageAdapter;
+    private static final String TAG = "BeverageListFragment";
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+        new FetchItemsTask().execute();
+    }
 
     @Nullable
     @Override
@@ -149,6 +158,19 @@ public class BeverageListFragment extends Fragment {
         @Override
         public int getItemCount() {
             return mBeverages.size();
+        }
+    }
+    private class FetchItemsTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void...params) {
+            new BeverageFetcher().fetchBeverages();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid){
+            super.onPostExecute(aVoid);
         }
     }
 }
