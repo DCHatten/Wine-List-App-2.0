@@ -86,11 +86,11 @@ The application must do all of the above work to get the extra credit. In order 
 
 ## Outside Resources Used
 
-
+Stack Overflow for assistance in pulling an email address from the contacts app and sending that email address in the intent to the email app.
 
 ## Known Problems, Issues, And/Or Errors in the Program
 
-
+None
 
 # Original Assignment README
 
