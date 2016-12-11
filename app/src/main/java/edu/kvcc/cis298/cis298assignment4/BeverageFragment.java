@@ -1,17 +1,27 @@
 package edu.kvcc.cis298.cis298assignment4;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+
+import java.util.Date;
 
 /**
  * Created by David Barnes on 11/3/2015.
@@ -20,6 +30,8 @@ public class BeverageFragment extends Fragment {
 
     //String key that will be used to send data between fragments
     private static final String ARG_BEVERAGE_ID = "beverage_id";
+    private static final int REQUEST_CONTACT = 1;
+    private static final int REQUEST_DATE = 0;
 
     //private class level vars for the model properties
     private EditText mId;
@@ -27,6 +39,10 @@ public class BeverageFragment extends Fragment {
     private EditText mPack;
     private EditText mPrice;
     private CheckBox mActive;
+    private Button mReportButton;
+    private Button mContactButton;
+    private String mContact;
+    private String mEmail;
 
     //Private var for storing the beverage that will be displayed with this fragment
     private Beverage mBeverage;
@@ -152,7 +168,124 @@ public class BeverageFragment extends Fragment {
             }
         });
 
-        //Lastley return the view with all of this stuff attached and set on it.
+        mReportButton = (Button)view.findViewById(R.id.beverage_report);
+        mReportButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Starting a new intent to send the data
+                Intent i = new Intent(Intent.ACTION_SENDTO);
+                //Setting the data type to plain text
+                i.setData(Uri.parse("mailto:" + mEmail));
+                //Putting the beverage details into the intent, using the get
+                //Beverage Details method
+                i.putExtra(Intent.EXTRA_TEXT, getBeverageDetails());
+                //Adding a subject from the contact string
+                i.putExtra(Intent.EXTRA_SUBJECT,
+                        getString(R.string.beverage_details_subject));
+                //Make sure the app prompts the user for which app they want to use
+                i = Intent.createChooser(i, getString(R.string.beverage_report));
+                //Start up the activity
+                startActivity(i);
+            }
+        });
+
+        final Intent pickContact = new Intent(Intent.ACTION_PICK,
+                ContactsContract.Contacts.CONTENT_URI);
+
+
+        mContactButton = (Button)view.findViewById(R.id.contact);
+        mContactButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivityForResult(pickContact, REQUEST_CONTACT);
+            }
+        });
+
+        //Checking to see if the contact string has changed, and if so, setting the button to the new value
+        if (getString(R.string.contact) != "Select Contact") {
+            mContactButton.setText(getString(R.string.contact));
+        }
+
+        //Check to see if a contacts app is available, and if not, disable the contact button
+        PackageManager packageManager = getActivity().getPackageManager();
+        if(packageManager.resolveActivity(pickContact,
+                PackageManager.MATCH_DEFAULT_ONLY) == null) {
+            mContactButton.setEnabled(false);
+        }
+
         return view;
     }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        //If the result code is not OK, we won't do any work.
+        if (resultCode != Activity.RESULT_OK) {
+            return;
+        }
+        //Check to see if there was a contact selected
+        if (requestCode == REQUEST_CONTACT && data != null) {
+            //Get the contactUri from the returned data
+            Uri contactUri = data.getData();
+            //Set a string array to hold contact names
+            String[] queryFields = new String[] {
+                    ContactsContract.Contacts.DISPLAY_NAME
+            };
+            //Set a string array to hold the contact emails
+            String[] queryEmail = new String[] {
+                    ContactsContract.CommonDataKinds.Email.DATA
+            };
+            //Define a cursor to pull the contact names queried
+            Cursor c = getActivity().getContentResolver()
+                    .query(contactUri, queryFields, null, null, null);
+            //Define a second cursor to pull the contact emails queried
+            Cursor cur = getActivity().getContentResolver()
+                    .query(ContactsContract.CommonDataKinds.Email.CONTENT_URI, null,
+                            ContactsContract.CommonDataKinds.Email.CONTACT_ID, null, null);
+
+            try {
+                if (c.getCount() == 0 && cur.getCount() == 0) {
+                    return;
+                }
+                c.moveToFirst();
+                cur.moveToFirst();
+                mContact = c.getString(0);
+                mEmail = cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
+                mContactButton.setText(mContact);
+            } finally {
+                c.close();
+            }
+        }
+    }
+
+    private String getBeverageDetails() {
+
+        //Set the string for whether the crime is solved to null
+        String isActive = null;
+
+        //If the crime is solved, we will set string to the solved
+        //string stored in strings.xml. Otherwise, the unsolved string.
+        if (mBeverage.isActive()) {
+            isActive = getString(R.string.beverage_is_active);
+        } else {
+            isActive = getString(R.string.beverage_not_active);
+        }
+
+        String price = "$" + Double.toString(mBeverage.getPrice());
+
+        //Create the final report string using the above created strings
+        //as the parameters for the crime_report string.
+        String report = getString(R.string.beverage_details,
+                mContact,
+                mBeverage.getId(),
+                mBeverage.getName(),
+                mBeverage.getPack(),
+                price,
+                isActive);
+
+        //Return the final built report string
+        return report;
+    }
+
+
 }

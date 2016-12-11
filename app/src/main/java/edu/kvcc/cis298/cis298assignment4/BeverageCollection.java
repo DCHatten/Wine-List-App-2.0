@@ -39,8 +39,6 @@ public class BeverageCollection {
         mBeverages = new ArrayList<>();
         //Set the context to the one that is passed in
         mContext = context;
-        //Call the private method to load the beverage list
-        loadBeverageList();
     }
 
     //Getters
@@ -55,6 +53,10 @@ public class BeverageCollection {
             }
         }
         return null;
+    }
+
+    public void setBeverages(List<Beverage> beverages) {
+        mBeverages = beverages;
     }
 
     //Method to load the beverage list from a CSV file

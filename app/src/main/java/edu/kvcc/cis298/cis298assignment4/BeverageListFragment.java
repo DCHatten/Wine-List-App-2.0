@@ -68,13 +68,19 @@ public class BeverageListFragment extends Fragment {
 
         //If there is no adapter, make a new one and send it in the list of beverages
         if (mBeverageAdapter == null) {
-            mBeverageAdapter = new BeverageAdapter(beverages);
-            //set the adapter for the recyclerview to the newly created adapter
-            mBeverageRecyclerView.setAdapter(mBeverageAdapter);
+            if(isAdded()) {
+                setupAdapter();
+            }
         } else {
             //adapter already exists, so just call the notify data set changed method to update
             mBeverageAdapter.notifyDataSetChanged();
         }
+    }
+
+    private void setupAdapter() {
+        BeverageCollection collection = BeverageCollection.get(getActivity());
+        mBeverageAdapter = new BeverageAdapter(collection.getBeverages());
+        mBeverageRecyclerView.setAdapter(mBeverageAdapter);
     }
 
     //Private class that is required to get a recyclerview working
@@ -160,17 +166,18 @@ public class BeverageListFragment extends Fragment {
             return mBeverages.size();
         }
     }
-    private class FetchItemsTask extends AsyncTask<Void, Void, Void> {
+    private class FetchItemsTask extends AsyncTask<Void, Void, List<Beverage>> {
 
         @Override
-        protected Void doInBackground(Void...params) {
-            new BeverageFetcher().fetchBeverages();
-            return null;
+        protected List<Beverage> doInBackground(Void...params) {
+            return new BeverageFetcher().fetchBeverages();
         }
 
         @Override
-        protected void onPostExecute(Void aVoid){
-            super.onPostExecute(aVoid);
+        protected void onPostExecute(List<Beverage> beverages){
+            BeverageCollection beverageCollection = BeverageCollection.get(getActivity());
+            beverageCollection.setBeverages(beverages);
+            setupAdapter();
         }
     }
 }
